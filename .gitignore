@@ -1,0 +1,5 @@
+.idea/
+frames/
+compile_video.py
+timelapse_recorder.py
+*.mp4
