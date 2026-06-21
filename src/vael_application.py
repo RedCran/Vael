@@ -31,6 +31,21 @@ class VaelApplication:
         )
         pygame.display.set_caption(src.constants.WINDOW_CAPTION)
 
+        try:
+            self.base_bg = pygame.image.load("assets/application_background.png").convert()
+            self.bg_image = pygame.transform.scale(
+                self.base_bg,
+                (
+                    src.constants.INITIAL_WINDOW_WIDTH,
+                    src.constants.INITIAL_WINDOW_HEIGHT
+                 )
+            )
+            self.use_bgimage = True
+
+        except pygame.error:
+            print("No background image found, defaulting to solid color")
+            self.use_bgimage = False
+
     def _initFont(self):
         self.font = pygame.font.SysFont(
             src.constants.FONT_FAMILY,
@@ -47,7 +62,32 @@ class VaelApplication:
                 if event.type == pygame.QUIT:
                     running = False
 
+                elif event.type == pygame.VIDEORESIZE:
+                    self.window_width, self.window_height = event.w, event.h
+                    self.window = pygame.display.set_mode(
+                        (
+                            self.window_width,
+                            self.window_height),
+                        pygame.RESIZABLE
+                    )
+
+                    if self.use_bgimage:
+                        self.bg_image = pygame.transform.scale(
+                            self.base_bg,
+                            (
+                                self.window_width,
+                                self.window_height
+                            )
+                        )
+
+
                 ui.cylinder_volume_scrollbar.scrollbar.handle_event(event)
+
+            # Window background
+            if self.use_bgimage:
+                self.window.blit(self.bg_image, (0, 0))
+            else:
+                self.window.fill(src.constants.BLACK)
 
             # Updates
             ui.cylinder_volume_scrollbar.scrollbar.update()
@@ -58,11 +98,11 @@ class VaelApplication:
 
             text_surface = self.font.render("Cylinder Volume", True, src.constants.WHITE)
 
-            self.window.fill(src.constants.BLACK)
-
             src.cylinder.drawCylinder(self.window)
             self.window.blit(text_surface, (800, 20))
             ui.cylinder_volume_scrollbar.scrollbar.draw(self.window)
 
             pygame.display.flip()
             clock.tick(60)
+
+# TODO: FIX APPLICATION COMPONENTS' POSITIONINGS ACCORDING TO BACKGROUND IMAGE
