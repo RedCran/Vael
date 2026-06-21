@@ -4,17 +4,17 @@ import pygame
 class Scrollbar:
     def __init__(self, bg_rectangle: pygame.Rect, thumb_width: int, thumb_height: int):
         """
-        Initialize a reusable vertical scrollbar component.
-        :param bg_rectangle: pygame.Rect() defining the track position and size.
-        :param thumb_width: Width of draggable slider handle.
-        :param thumb_height: Height of draggable slider handle.
+        Initialize reusable vertical scrollbar component
+        :param bg_rectangle: pygame.Rect() define track position and size
+        :param thumb_width: Width of draggable slider handle
+        :param thumb_height: Height of draggable slider handle
         """
         # Track geometry
         self.track_rect = bg_rectangle
 
         # Build thumb rectangle centered horizontally on the track
         thumb_x = self.track_rect.x + (self.track_rect.width - thumb_width) // 2
-        thumb_y = self.track_rect.y
+        thumb_y = self.track_rect.y + self.track_rect.height - thumb_height # CHANGED
         self.thumb_rect = pygame.Rect(thumb_x, thumb_y, thumb_width, thumb_height)
 
         # State tracking flags
@@ -23,7 +23,7 @@ class Scrollbar:
         self.scroll_value = 0.0  # Output float between 0.0 and 1.0
 
     def handle_event(self, event: pygame.event.Event):
-        """Process mouse interactions."""
+        """Process mouse interactions"""
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             if self.thumb_rect.collidepoint(event.pos):
                 self.is_dragging = True
@@ -34,7 +34,7 @@ class Scrollbar:
             self.is_dragging = False
 
     def update(self):
-        """Calculate sliding positions and clamps values when dragging."""
+        """Calculate sliding positions and clamp values when dragging"""
         if self.is_dragging:
             mouse_y = pygame.mouse.get_pos()[1]
             new_y = mouse_y + self.mouse_offset_y
@@ -46,13 +46,13 @@ class Scrollbar:
 
             # Recompute current percentage from 0.0 to 1.0
             total_travel = self.track_rect.height - self.thumb_rect.height
-            if total_travel > 0:
-                current_travel = self.thumb_rect.y - self.track_rect.top
+            if total_travel >= 0:
+                current_travel = self.track_rect.bottom - self.thumb_rect.y
                 self.scroll_value = current_travel / total_travel
             else:
                 self.scroll_value = 0.0
 
     def draw(self, surface: pygame.Surface, track_color="gray20", thumb_color="gray70"):
-        """Draw the track and slider on the specified target surface canvas."""
+        """Draw track and slider on specified target surface canvas"""
         pygame.draw.rect(surface, track_color, self.track_rect, border_radius=5)
         pygame.draw.rect(surface, thumb_color, self.thumb_rect, border_radius=5)

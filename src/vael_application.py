@@ -51,18 +51,16 @@ class VaelApplication:
 
             # Updates
             ui.cylinder_volume_scrollbar.scrollbar.update()
-            src.cylinder.border_rect.width = ui.cylinder_volume_scrollbar.scrollbar.scroll_value * 250 + src.constants.MINIMUM_CYLINDER_WIDTH
+            if ui.cylinder_volume_scrollbar.scrollbar.scroll_value == 0:
+                src.cylinder.border_rect.width = ui.cylinder_volume_scrollbar.scrollbar.scroll_value * 250 + src.constants.MINIMUM_CYLINDER_WIDTH
+            else:
+                src.cylinder.border_rect.width = ui.cylinder_volume_scrollbar.scrollbar.scroll_value * 250
 
             text_surface = self.font.render("Cylinder Volume", True, src.constants.WHITE)
 
             self.window.fill(src.constants.BLACK)
 
-            pygame.draw.rect(
-                self.window,
-                src.cylinder.border_color,
-                src.cylinder.border_rect,
-                src.cylinder.border_width
-            )
+            src.cylinder.drawCylinder(self.window)
             self.window.blit(text_surface, (800, 20))
             ui.cylinder_volume_scrollbar.scrollbar.draw(self.window)
 
